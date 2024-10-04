@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    environment:
+      - COLDKEY_SWAP_DISCORD_WEBHOOK_URL=${COLDKEY_SWAP_DISCORD_WEBHOOK_URL}
+      - DISSOLVE_NETWORK_DISCORD_WEBHOOK_URL=${DISSOLVE_NETWORK_DISCORD_WEBHOOK_URL}
+      - TAOSTATS_API_KEY=${TAOSTATS_API_KEY}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - SUBTENSOR_ENDPOINT=${SUBTENSOR_ENDPOINT}
+    command: ["python", "main.py"]
