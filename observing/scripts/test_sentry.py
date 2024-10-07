@@ -1,18 +1,17 @@
 import sentry_sdk
 from dotenv import load_dotenv
-# Initialize Sentry
+import os
 load_dotenv()
 
 SENTRY_DSN = os.getenv('SENTRY_DSN')
 sentry_sdk.init(
-    dsn=SENTRY_DSN,  # Replace with your Sentry DSN
+    dsn=SENTRY_DSN,
 )
 
 def divide(a, b):
     try:
         return a / b
     except ZeroDivisionError as e:
-        # Capture the exception in Sentry
         sentry_sdk.capture_exception(e)
         return "Error: Division by zero!"
 
