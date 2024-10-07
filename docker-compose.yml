@@ -13,4 +13,6 @@ services:
       - TAOSTATS_API_KEY=${TAOSTATS_API_KEY}
       - SENTRY_DSN=${SENTRY_DSN}
       - SUBTENSOR_ENDPOINT=${SUBTENSOR_ENDPOINT}
+    env_file:
+      - ./.env
     command: ["python", "main.py"]

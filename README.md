@@ -1,4 +1,4 @@
-# Bittensor Network Observer
+# Bittensor Chain Observer
 
 This project is designed to observe and report on specific events and transactions occurring on the Bittensor blockchain network. It focuses on monitoring scheduled coldkey swaps, network dissolves, voting activities, and other critical network events.
 
