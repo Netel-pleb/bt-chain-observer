@@ -3,58 +3,33 @@ import subprocess
 import time
 import sched
 import threading
-from observing.utils.get_coldkeys import find_owner_coldkey, find_validator_coldkey
-import os
-import sentry_sdk
-from dotenv import load_dotenv
+import logging
+from db_manage.db_manager import db_manager
+from chain_observer.utils.check_thread_status import check_update_thread_status
+from chain_observer.utils.sentry import init_sentry
 
-def init_sentry(): 
-    """Initialize Sentry"""
-    load_dotenv()
-    SENTRY_DSN = os.getenv('SENTRY_DSN')
-    
-    sentry_sdk.init(
-        dsn=SENTRY_DSN,  
-        traces_sample_rate=1.0
-    )
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def run_bot():
-    """Runs a specified script."""
-    subprocess.run(['python', 'run.py'])  # Replace 'run.py' with the actual filename if different
+def run_script(script_name):
+    """Runs a specified Python script."""
+    try:
+        subprocess.run(['python', script_name], check=True)
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error executing script {script_name}: {e}")
 
-
-def schedule_bot(scheduler, interval):
-    """Schedules the bot to run at regular intervals."""
-
-    threading.Thread(target=run_bot).start()
-    scheduler.enter(interval, 1, schedule_bot, (scheduler, interval))
-
+def schedule_task(scheduler, task, interval, *args):
+    """Schedules a task to run at regular intervals."""
+    threading.Thread(target=task, args=args).start()
+    scheduler.enter(interval, 1, schedule_task, (scheduler, task, interval) + args)
 
 def update_coldkeys():
-    """Runs find_validator_coldkey and find_owner_coldkey in sequence."""
-
-    status = check_thread_status()
-    if status == 'not running':
-        find_owner_coldkey()
-    find_validator_coldkey()
-
-
-def schedule_update_dataset(scheduler, interval):
-    """Schedules the dataset to update at regular intervals."""
-
-    threading.Thread(target=update_coldkeys).start()
-    scheduler.enter(interval, 1, schedule_update_dataset, (scheduler, interval))
-
-
-def check_thread_status():
-    try:
-        with open('thread_status.status', 'r') as f:
-            status = f.read().strip()
-            return status
-    except FileNotFoundError:
-        return 'not running'
+    """Executes find_validator_coldkey and find_owner_coldkey in sequence."""
+    if check_update_thread_status() == 'not running':
+        db_manager.update_whole_owner_coldkeys()
+    db_manager.update_whole_validator_coldkeys()
 
 if __name__ == "__main__":
+    
     init_sentry()
     
     bot_interval = 12  # Interval in seconds for running the bot
@@ -62,6 +37,13 @@ if __name__ == "__main__":
     initial_delay = 86400  # Delay in seconds before starting the dataset update (1 day)
 
     scheduler = sched.scheduler(time.time, time.sleep)
-    scheduler.enter(0, 1, schedule_bot, (scheduler, bot_interval))
-    scheduler.enter(initial_delay, 1, schedule_update_dataset, (scheduler, update_dataset_interval))
-    scheduler.run()
+    scheduler.enter(0, 1, schedule_task, (scheduler, run_script, bot_interval, 'run.py'))
+    scheduler.enter(initial_delay, 1, schedule_task, (scheduler, update_coldkeys, update_dataset_interval))
+    
+    try:
+        logging.info("Starting the scheduler.")
+        scheduler.run()
+    except KeyboardInterrupt:
+        logging.info("Scheduler terminated by user.")
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
