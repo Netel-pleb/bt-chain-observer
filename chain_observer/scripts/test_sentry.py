@@ -16,5 +16,5 @@ def divide(a, b):
         return "Error: Division by zero!"
 
 if __name__ == "__main__":
-    print(divide(10, 2))  # This will work
-    print(divide(10, 0))  # This will trigger an error
+    divide(10, 2)  # This will work
+    divide(10, 0)  # This will trigger an error

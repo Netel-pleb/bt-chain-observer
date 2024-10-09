@@ -1,8 +1,12 @@
 import requests
 import os
 from dotenv import load_dotenv
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 load_dotenv()
+
 TAOSTATS_API_KEY = os.getenv('TAOSTATS_API_KEY')
 
 def fetch_all_pages(url, headers):
@@ -24,11 +28,11 @@ def main():
 
     try:
         results = fetch_all_pages(url, headers)
-        print(results)
+        logging.info(results)
     except requests.exceptions.HTTPError as e:
-        print(f"HTTPError: {e}")
+        logging.info(f"HTTPError: {e}")
     except Exception as e:
-        print(f"Exception: {e}")
+        logging.info(f"Exception: {e}")
 
 if __name__ == "__main__":
     main()
