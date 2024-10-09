@@ -4,22 +4,17 @@ import sentry_sdk
 import logging
 from sentry_sdk.integrations.logging import LoggingIntegration
 
-
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def init_sentry():
     """Initialize Sentry for error tracking."""
-    load_dotenv()
-    
     sentry_logging = LoggingIntegration(
     level=logging.INFO,        # Capture info and above as breadcrumbs
     event_level=logging.ERROR  # Send errors as events
-    
     )
-
     sentry_dsn = os.getenv('SENTRY_DSN')
-    
     if sentry_dsn:
         sentry_sdk.init(
             dsn=sentry_dsn,

@@ -222,7 +222,6 @@ class BtChainObserver:
         except Exception as e:
             logging.exception("Error extracting failed schedule coldkey swap details.")
 
-
     def process_schedule_swap_coldkey(self, extrinsics, events, schedule_swap_coldkey_idx, current_block_number):
         """
         Processes scheduled coldkey swap extrinsics and generates a report.
@@ -417,6 +416,7 @@ class BtChainObserver:
         # Check and process vote
         if vote_idx >= 0:
             vote_report = self.process_vote(block['extrinsics'], events, vote_idx, current_block_number)
+            
         # Check and processr coldkey swapped
         if swapped_old_coldkey:
             swapped_coldkey_report = self.process_swapped_coldkey(block['extrinsics'], swapped_old_coldkey, swapped_new_coldkey, current_block_number)    
@@ -424,6 +424,5 @@ class BtChainObserver:
         #Check and process dissolved network
         if dissolved_network_uid:
             dissloved_subnet_resport, should_update_owner_table = self.process_dissolved_network(block['extrinsics'], current_block_number, dissolved_network_uid)
-
 
         return schedule_swap_coldkey_report, schedule_dissolve_subnet_report, vote_report, dissloved_subnet_resport, swapped_coldkey_report, should_update_owner_table

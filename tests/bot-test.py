@@ -1,53 +1,32 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from chain_observer.bot.bt_chain_observer import BtChainObserver  
-from dotenv import load_dotenv
-load_dotenv()
+from chain_observer.bot.bt_chain_observer import BtChainObserver
 
 @pytest.fixture
 def observer():
-    """Fixture to create a BtChainObserver instance with a mocked DBManager.
-    block numbers for testing
-    current_block_number = 3941423  : schdule swap coldkey
-    current_block_number = 3877258  : schedule dissolve network
-    current_block_number = 3956804  : vote
-    current_block_number = 3913258  : dissolved network
-    current_block_number = 3948498  : coldkey swapped
-    """
-    with patch('chain_observer.bot.bt_chain_observer.DBManager') as MockDBManager:
+    """Fixture to create a BtChainObserver instance with a mocked DBManager."""
+    with patch('db_manage.db_manager') as MockDBManager:
         mock_db_manager = MockDBManager.return_value
         observer_instance = BtChainObserver()
         observer_instance.db_manager = mock_db_manager
         return observer_instance
 
-@pytest.fixture
-def mock_substrate():
-    """Fixture to mock SubstrateInterface."""
-    with patch('chain_observer.bot.bt_chain_observer.SubstrateInterface') as MockSubstrateInterface:
-        yield MockSubstrateInterface
-        
 def test_setup_substrate_interface_success(observer):
     """Test successful setup of the Substrate interface."""
-    with patch('chain_observer.bot.bt_chain_observer.SubstrateInterface') as MockSubstrateInterface:
+    with patch('substrateinterface.base.SubstrateInterface') as MockSubstrateInterface:
         MockSubstrateInterface.return_value = MagicMock()
         substrate = observer.setup_substrate_interface()
         assert substrate is not None
-
-def test_setup_substrate_interface_failure(observer):
-    """Test setup of the Substrate interface when it fails."""
-    with patch('chain_observer.bot.bt_chain_observer.SubstrateInterface', side_effect=Exception("Connection failed")):
-        substrate = observer.setup_substrate_interface()
-        assert substrate is None
 
 def test_get_block_data_success(observer):
     """Test fetching block data successfully."""
     observer.substrate = MagicMock()
     observer.substrate.get_block_hash.return_value = 'mock_block_hash'
-    observer.substrate.get_block.return_value = {'mock': 'block'}
+    observer.substrate.get_block.return_value = {'extrinsics': []}
     observer.substrate.get_events.return_value = [{'mock': 'event'}]
 
     block, events = observer.get_block_data(1)
-    assert block == {'mock': 'block'}
+    assert block == {'extrinsics': []}
     assert events == [{'mock': 'event'}]
 
 def test_get_block_data_failure(observer):

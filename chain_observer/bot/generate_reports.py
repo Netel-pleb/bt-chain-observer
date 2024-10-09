@@ -14,7 +14,6 @@ def generate_report(title, success, details, time_stamp):
         }]
         for key, value in details.items():
             if key == 'identifier':
-                print(value)
                 fields.append({
                     "name": f"\n\n🔑 ** COLDKEY ** \n\n\n",
                     "value": f"{value}\n\n",

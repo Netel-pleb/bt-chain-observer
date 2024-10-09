@@ -177,7 +177,6 @@ class DBManager:
         Returns:
             list: A list of all validators.
         """
-        
         validators = []
         page = 1
         while True:
@@ -224,7 +223,6 @@ class DBManager:
         """
         Fetches validator coldkeys, hotkeys, and amounts from the API and saves them to the SQLite database.
         """  
-        
         url = "https://api.taostats.io/api/v1/validator"
         headers = {
             "accept": "application/json",
@@ -274,8 +272,8 @@ class DBManager:
         conn.commit()
         logging.info("validator coldkeys table is updated")
 
-    def get_validator_names(self, hotkey):
-        
+    def get_validator_names(self, hotkey): 
+        '''Get validator name using taostats API'''
         url = f"https://api.taostats.io/api/v1/delegate/info?address={hotkey}"
         headers = {
             "accept": "application/json",
@@ -292,5 +290,5 @@ class DBManager:
             return response["delegates"][0]["name"]
         else:
             return None
-        
+
 db_manager = DBManager()

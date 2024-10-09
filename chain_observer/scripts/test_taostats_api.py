@@ -25,7 +25,6 @@ def main():
         "accept": "application/json",
         "Authorization": f"Bearer {TAOSTATS_API_KEY}"
     }
-
     try:
         results = fetch_all_pages(url, headers)
         logging.info(results)

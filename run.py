@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from chain_observer.bot.discord_report import post_to_discord
 from chain_observer.bot.bt_chain_observer import BtChainObserver
 from db_manage.db_manager import db_manager
-from chain_observer.utils.check_thread_status import check_update_thread_status
+from chain_observer.utils.check_thread_status import check_thread_staus
 
 load_dotenv()
 
@@ -37,7 +37,7 @@ def run_bot():
          should_update_owner_table) = chain_observer.bt_block_observer()
         
         if should_update_owner_table:
-            thread_status = check_update_thread_status()
+            thread_status = check_thread_staus()
             if thread_status == 'not running':
                 update_owner_thread = threading.Thread(target=run_update_owner_coldkey_function)
                 update_owner_thread.start()

@@ -5,7 +5,7 @@ import sched
 import threading
 import logging
 from db_manage.db_manager import db_manager
-from chain_observer.utils.check_thread_status import check_update_thread_status
+from chain_observer.utils.check_thread_status import check_thread_staus
 from chain_observer.utils.sentry import init_sentry
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -24,7 +24,7 @@ def schedule_task(scheduler, task, interval, *args):
 
 def update_coldkeys():
     """Executes find_validator_coldkey and find_owner_coldkey in sequence."""
-    if check_update_thread_status() == 'not running':
+    if check_thread_staus() == 'not running':
         db_manager.update_whole_owner_coldkeys()
     db_manager.update_whole_validator_coldkeys()
 
